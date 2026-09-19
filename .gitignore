@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+# Env
+.env
+.env.*
+!.env.example
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+# Logs
+*.log
+logs/
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+# Docker
+pgdata/
+redisdata/
+# Local test files
+test.html
+ngrok*
+error.txt
