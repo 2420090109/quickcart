@@ -1,0 +1,74 @@
+{# Drawer body — rendered inside #cart-drawer-body.
+When a mutation completes, HTMX swaps this into the drawer AND swaps the
+cart badge in the header via the OOB (out-of-band) block at the bottom.
+#}
+{% if cart and cart.items %}
+    <div class="flex flex-col h-full">
+        {# Shop line #}
+        <div class="px-5 py-3 border-b border-gray-200 bg-gray-50">
+            <div class="text-xs text-gray-500">Ordering from</div>
+            <div class="font-semibold text-gray-900 text-sm">{{ cart.shop_name }}</div>
+        </div>
+        {# Items #}
+        <div class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            {% for item in cart.items %}
+                {% include "cart/_item.html" %}
+            {% endfor %}
+        </div>
+        {# Footer with total + checkout #}
+        <div class="border-t border-gray-200 bg-white px-5 py-4 space-y-3">
+            {% if not cart.meets_min_order %}
+            <div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                Add ₹{{ (cart.min_order_value - cart.subtotal) }} more to reach the minimum order.
+            </div>
+            {% endif %}
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Subtotal ({{ cart.item_count }} items)</span>
+                <span class="font-semibold text-gray-900">₹{{ cart.subtotal }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-600">Delivery fee</span>
+                <span class="font-semibold text-gray-900">₹{{ cart.delivery_fee }}</span>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-gray-200">
+                <span class="font-semibold text-gray-900">Total</span>
+                <span class="text-lg font-bold text-gray-900">₹{{ cart.subtotal + cart.delivery_fee }}</span>
+            </div>
+            {% if cart.meets_min_order %}
+            <a href="/checkout"
+               class="block w-full text-center bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                Proceed to checkout →
+            </a>
+            {% else %}
+            <button disabled
+                class="block w-full text-center bg-gray-300 text-gray-500 font-semibold py-3 rounded-lg cursor-not-allowed">
+                Add more items
+            </button>
+            {% endif %}
+            <button hx-post="/cart/clear" hx-target="#cart-drawer-body" hx-swap="innerHTML"
+                class="block w-full text-center text-xs text-gray-500 hover:text-red-600 transition-colors">
+                Clear cart
+            </button>
+        </div>
+    </div>
+{% else %}
+    {# Empty state #}
+    <div class="flex flex-col items-center justify-center h-full py-12 px-6 text-center">
+        <div class="text-6xl">🛒</div>
+        <h3 class="mt-4 font-semibold text-gray-900">Your cart is empty</h3>
+        <p class="text-sm text-gray-600 mt-1">Add products from a shop to get started.</p>
+        <a href="/shops" class="mt-5 px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
+            Browse shops
+        </a>
+    </div>
+{% endif %}
+{# ------- Out-of-band swaps ------- #}
+<span id="cart-badge" hx-swap-oob="true">
+    {% if cart and cart.item_count %}
+        <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 grid place-items-center bg-brand-600 text-white text-[10px] font-bold rounded-full">
+            {{ cart.item_count }}
+        </span>
+    {% endif %}
+</span>
+<div id="toast-trigger" hx-swap-oob="true"
+     hx-on:load="window.toast('Cart updated', 'success')"></div>

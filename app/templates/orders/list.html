@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}My Orders — QuickCart{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
+{% if orders %}
+<div class="space-y-3">
+    {% for o in orders %}
+    <a href="/orders/{{ o.code }}"
+       class="block bg-white border border-gray-200 hover:border-brand-300 hover:shadow-sm rounded-2xl p-5 transition-all">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <div class="font-semibold text-gray-900">{{ o.code }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">{{ o.created_at.strftime('%d %b %Y · %I:%M %p') }}</div>
+            </div>
+            <div class="text-right">
+                <div class="font-semibold text-gray-900">₹{{ o.total }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">{{ o.item_count }} item{{ 's' if o.item_count != 1 }}</div>
+            </div>
+            <div>
+                {% set colors = {
+                    'placed':'bg-blue-100 text-blue-800',
+                    'accepted':'bg-indigo-100 text-indigo-800',
+                    'packing':'bg-amber-100 text-amber-800',
+                    'packed':'bg-amber-100 text-amber-800',
+                    'out_for_delivery':'bg-purple-100 text-purple-800',
+                    'delivered':'bg-brand-100 text-brand-800',
+                    'cancelled':'bg-red-100 text-red-800',
+                    'rejected':'bg-red-100 text-red-800',
+                    'refunded':'bg-gray-100 text-gray-800',
+                } %}
+                <span class="text-xs font-semibold px-3 py-1 rounded-full {{ colors.get(o.status.value, 'bg-gray-100 text-gray-800') }}">
+                    {{ o.status.value.replace('_',' ').upper() }}
+                </span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-16">
+    <div class="text-6xl">📦</div>
+    <h3 class="mt-4 font-semibold text-gray-900">No orders yet</h3>
+    <p class="text-sm text-gray-600 mt-1">Your order history will appear here.</p>
+    <a href="/shops" class="inline-block mt-5 px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
+        Browse shops
+    </a>
+</div>
+{% endif %}
+{% endblock %}

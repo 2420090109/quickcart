@@ -1,0 +1,47 @@
+<div class="bg-white rounded-2xl border border-gray-200 p-5 lg:sticky lg:top-20">
+    <h2 class="font-semibold text-gray-900 mb-4">Order summary</h2>
+    <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
+        {% for item in cart.items %}
+        <div class="flex items-start gap-3 text-sm">
+            <div class="w-10 h-10 rounded-lg bg-gray-50 grid place-items-center flex-shrink-0">
+                <span class="text-lg">
+                    {%- if 'banana' in item.product_name|lower %}🍌
+                    {%- elif 'apple' in item.product_name|lower %}🍎
+                    {%- elif 'tomato' in item.product_name|lower %}🍅
+                    {%- elif 'onion' in item.product_name|lower %}🧅
+                    {%- elif 'milk' in item.product_name|lower %}🥛
+                    {%- elif 'bread' in item.product_name|lower %}🍞
+                    {%- else %}🛒{%- endif %}
+                </span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-gray-900 truncate">{{ item.product_name }}</div>
+                <div class="text-xs text-gray-500">{{ item.quantity }} × ₹{{ item.unit_price }}</div>
+            </div>
+            <div class="font-medium text-gray-900">₹{{ item.line_total }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="mt-5 pt-4 border-t border-gray-200 space-y-2 text-sm">
+        <div class="flex justify-between">
+            <span class="text-gray-600">Subtotal</span>
+            <span class="font-medium">₹{{ cart.subtotal }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-600">Delivery</span>
+            <span class="font-medium">₹{{ cart.delivery_fee }}</span>
+        </div>
+        <div class="flex justify-between pt-2 border-t border-gray-200">
+            <span class="font-semibold text-gray-900">Total</span>
+            <span class="text-lg font-bold text-gray-900">₹{{ cart.subtotal + cart.delivery_fee }}</span>
+        </div>
+    </div>
+    <button type="submit"
+    class="w-full mt-5 bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-lg transition-colors">
+    <span class="htmx-indicator inline-block mr-2">⏳</span>
+    Place order
+</button>
+    <p class="text-[11px] text-gray-500 text-center mt-3">
+        By placing this order you agree to QuickCart's terms.
+    </p>
+</div>

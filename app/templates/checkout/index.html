@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Checkout — QuickCart{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-900 mb-6">Checkout</h1>
+<form method="post" action="/checkout/place" class="grid grid-cols-1 lg:grid-cols-3 gap-6" novalidate>
+    <div class="lg:col-span-2 space-y-6">
+        {# Addresses #}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-gray-900">Delivery address</h2>
+                <button type="button"
+                    onclick="document.getElementById('add-address-form').classList.toggle('hidden')"
+                    class="text-sm text-brand-600 hover:underline">+ Add new</button>
+            </div>
+            <div id="address-list">
+                {% include "checkout/_address_list.html" %}
+            </div>
+            <div id="add-address-form" class="hidden mt-5 pt-5 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800 mb-3">New address</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input name="label" placeholder="Label (Home, Work)" class="px-3 py-2 text-sm border border-gray-300 rounded-lg md:col-span-2" />
+                    <input name="line1" placeholder="Flat, street, area" class="px-3 py-2 text-sm border border-gray-300 rounded-lg md:col-span-2" />
+                    <input name="city" placeholder="City" value="Bengaluru" class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                    <input name="state" placeholder="State" value="Karnataka" class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                    <input name="pincode" placeholder="Pincode" value="560095" class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+                </div>
+                <button type="button"
+                    hx-post="/checkout/address"
+                    hx-include="#add-address-form input"
+                    hx-target="#address-list"
+                    hx-swap="innerHTML"
+                    class="mt-3 px-4 py-2 text-sm font-semibold bg-gray-900 hover:bg-black text-white rounded-lg">
+                    Save address
+                </button>
+            </div>
+        </div>
+        {# Slot #}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+            <h2 class="font-semibold text-gray-900 mb-4">Delivery slot</h2>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-3 p-4 border-2 border-brand-600 bg-brand-50 rounded-xl cursor-pointer">
+                    <input type="radio" name="slot_type" value="express" checked class="text-brand-600" />
+                    <div>
+                        <div class="font-semibold text-gray-900 text-sm">Express</div>
+                        <div class="text-xs text-gray-600">~30 minutes</div>
+                    </div>
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 border-gray-200 hover:border-brand-500 rounded-xl cursor-pointer">
+                    <input type="radio" name="slot_type" value="scheduled" class="text-brand-600" />
+                    <div>
+                        <div class="font-semibold text-gray-900 text-sm">Scheduled</div>
+                        <div class="text-xs text-gray-600">Pick a time</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        {# Payment #}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+            <h2 class="font-semibold text-gray-900 mb-4">Payment method</h2>
+            <div class="space-y-2">
+                <label class="flex items-center gap-3 p-4 border-2 border-gray-200 hover:border-brand-500 rounded-xl cursor-pointer">
+                    <input type="radio" name="payment_method" value="cod" checked class="text-brand-600" />
+                    <div>
+                        <div class="font-semibold text-gray-900 text-sm">Cash on delivery</div>
+                        <div class="text-xs text-gray-600">Pay when your order arrives</div>
+                    </div>
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 border-gray-200 hover:border-brand-500 rounded-xl cursor-pointer">
+                    <input type="radio" name="payment_method" value="razorpay" class="text-brand-600" />
+                    <div>
+                        <div class="font-semibold text-gray-900 text-sm">Pay online</div>
+                        <div class="text-xs text-gray-600">Card, UPI, Netbanking via Razorpay</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+        {# Note #}
+        <div class="bg-white rounded-2xl border border-gray-200 p-5">
+            <h2 class="font-semibold text-gray-900 mb-3">Delivery note (optional)</h2>
+            <textarea name="customer_note" rows="2" maxlength="500"
+                placeholder="e.g. Ring the bell twice"
+                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg"></textarea>
+        </div>
+    </div>
+    <div class="lg:col-span-1">
+        {% include "checkout/_summary.html" %}
+    </div>
+</form>
+{% endblock %}

@@ -1,4 +1,4 @@
-"""Order service — checkout, state machine, and history."""
+"""Order service â€” checkout, state machine, and history."""
 import secrets
 import uuid
 from datetime import datetime, timezone
@@ -85,6 +85,7 @@ async def _load_order_with_relations(
         .options(
             selectinload(Order.items),
             selectinload(Order.events),
+            selectinload(Order.payments),
         )
     )
     return (await db.execute(stmt)).scalar_one()
@@ -102,7 +103,7 @@ async def place_order(
     payment_method: str,
     idempotency_key: str | None,
 ) -> Order:
-    # 0. Idempotency — same key returns the same order
+    # 0. Idempotency â€” same key returns the same order
     if idempotency_key:
         existing = (
             await db.execute(
@@ -263,8 +264,9 @@ async def get_order_by_code(
         select(Order)
         .where(Order.code == code)
         .options(
-            selectinload(Order.items),
-            selectinload(Order.events),
+        selectinload(Order.items),
+        selectinload(Order.events),
+        selectinload(Order.payments),
         )
     )
     order = (await db.execute(stmt)).scalar_one_or_none()
@@ -326,7 +328,11 @@ async def cancel_order(
     stmt = (
         select(Order)
         .where(Order.code == code)
-        .options(selectinload(Order.items), selectinload(Order.events))
+        .options(
+            selectinload(Order.items),
+            selectinload(Order.events),
+            selectinload(Order.payments),
+        )
     )
     order = (await db.execute(stmt)).scalar_one_or_none()
     if order is None:

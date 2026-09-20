@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{{ shop.name }} — QuickCart{% endblock %}
+{% block content %}
+{# Shop header card #}
+<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
+    <div class="h-32 md:h-40 bg-gradient-to-br from-brand-100 to-brand-50 grid place-items-center">
+        <span class="text-6xl">🏪</span>
+    </div>
+    <div class="p-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ shop.name }}</h1>
+                {% if shop.description %}
+                <p class="text-sm text-gray-600 mt-1">{{ shop.description }}</p>
+                {% endif %}
+                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-sm text-gray-600">
+                    <span>📍 {{ shop.address_line }}, {{ shop.city }}</span>
+                    <span>📞 {{ shop.phone }}</span>
+                </div>
+            </div>
+            {% if shop.is_open %}
+                <span class="text-xs font-semibold px-3 py-1 bg-brand-100 text-brand-800 rounded-full">OPEN</span>
+            {% else %}
+                <span class="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-600 rounded-full">CLOSED</span>
+            {% endif %}
+        </div>
+        <div class="grid grid-cols-3 gap-3 mt-5 pt-5 border-t border-gray-200 text-center">
+            <div>
+                <div class="text-sm text-gray-500">Prep time</div>
+                <div class="font-semibold text-gray-900 mt-0.5">{{ shop.avg_prep_minutes }} min</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Delivery fee</div>
+                <div class="font-semibold text-gray-900 mt-0.5">₹{{ shop.delivery_fee }}</div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Min order</div>
+                <div class="font-semibold text-gray-900 mt-0.5">₹{{ shop.min_order_value }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{# Categories as tabs #}
+{% if shop.categories %}
+<div class="sticky top-14 z-30 bg-gray-50 -mx-4 px-4 py-3 mb-4 overflow-x-auto">
+    <div class="flex gap-2 whitespace-nowrap">
+        <button hx-get="/shops/{{ shop.slug }}/products"
+                hx-target="#product-grid"
+                class="px-4 py-2 text-sm font-medium bg-brand-600 text-white rounded-full">
+            All
+        </button>
+        {% for cat in shop.categories %}
+        <button hx-get="/shops/{{ shop.slug }}/products?category_slug={{ cat.slug }}"
+                hx-target="#product-grid"
+                class="px-4 py-2 text-sm font-medium bg-white border border-gray-300 hover:border-brand-500 hover:text-brand-600 text-gray-700 rounded-full">
+            {{ cat.name }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{# Products #}
+<div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+    {% include "shops/_product_grid.html" %}
+</div>
+{% endblock %}

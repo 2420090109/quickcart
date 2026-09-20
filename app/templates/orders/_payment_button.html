@@ -1,0 +1,20 @@
+{# Pay button for pending Razorpay orders. #}
+{# Expects: order (Order), shows only if latest payment is PENDING + method RAZORPAY. #}
+{% set latest_payment = order.payments[0] if order.payments else None %}
+{% if latest_payment
+      and latest_payment.status.value == 'pending'
+      and latest_payment.method.value == 'razorpay'
+      and order.status.value not in ('cancelled','rejected','refunded','delivered') %}
+<div class="bg-amber-50 border border-amber-200 rounded-2xl p-5" id="payment-block">
+    <div class="font-semibold text-amber-900 text-sm">Payment pending</div>
+    <p class="text-xs text-amber-800 mt-1">Complete your payment to confirm this order.</p>
+    <button
+        id="razorpay-btn"
+        data-order-code="{{ order.code }}"
+        class="mt-3 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-lg text-sm transition-colors">
+        <span class="btn-text">Pay ₹{{ order.total }}</span>
+        <span class="btn-spinner hidden">Processing…</span>
+    </button>
+    <p id="payment-error" class="hidden mt-2 text-xs text-red-700"></p>
+</div>
+{% endif %}

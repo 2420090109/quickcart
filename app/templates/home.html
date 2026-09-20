@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}QuickCart — Groceries in minutes{% endblock %}
+{% block content %}
+<div class="text-center py-12">
+    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+        Groceries delivered <span class="text-brand-600">in minutes</span>
+    </h1>
+    <p class="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">
+        Order from your favourite neighbourhood shops. Fresh produce, dairy, snacks — delivered to your door.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3 justify-center">
+        <a href="/shops" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-lg shadow-sm">
+            Browse shops
+        </a>
+        {% if not current_user %}
+        <a href="/signup" class="px-6 py-3 bg-white hover:bg-gray-50 text-gray-800 font-semibold rounded-lg border border-gray-300">
+            Create account
+        </a>
+        {% endif %}
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-3xl">🛒</div>
+        <h3 class="mt-3 font-semibold text-gray-900">Easy ordering</h3>
+        <p class="text-sm text-gray-600 mt-1">Browse products, add to cart, checkout in seconds.</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-3xl">⚡</div>
+        <h3 class="mt-3 font-semibold text-gray-900">Fast delivery</h3>
+        <p class="text-sm text-gray-600 mt-1">Express 30-minute delivery, or schedule for later.</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="text-3xl">🔒</div>
+        <h3 class="mt-3 font-semibold text-gray-900">Secure payments</h3>
+        <p class="text-sm text-gray-600 mt-1">Pay online with Razorpay, or cash on delivery.</p>
+    </div>
+</div>
+<div class="mt-12 text-center text-sm text-gray-500">
+    Test the API directly at <a href="/docs" class="text-brand-600 hover:underline">/docs</a>
+</div>
+{% endblock %}

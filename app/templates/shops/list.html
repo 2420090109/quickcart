@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Shops — QuickCart{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Shops near you</h1>
+        <p class="text-sm text-gray-600 mt-0.5">{{ shops | length }} shop{{ 's' if shops | length != 1 else '' }} available</p>
+    </div>
+    <form hx-get="/shops" hx-target="#shop-grid" hx-swap="innerHTML" class="flex items-center gap-2">
+        <input type="hidden" name="format" value="html" />
+        <input type="text" name="city" placeholder="Filter by city"
+            class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-40 md:w-56" />
+        <button type="submit"
+            class="px-4 py-2 text-sm font-medium bg-brand-600 hover:bg-brand-700 text-white rounded-lg">
+            Search
+        </button>
+    </form>
+</div>
+{# Nearby search — collapsible #}
+<div x-data="{ open: false }" class="mb-6">
+    <button @click="open = !open" class="text-sm text-brand-600 hover:underline flex items-center gap-1">
+        <span x-text="open ? '▼' : '▶'"></span>
+        Find shops near me
+    </button>
+    <div x-show="open" x-cloak class="mt-3 bg-white border border-gray-200 rounded-xl p-4">
+        <form hx-get="/shops/nearby" hx-target="#shop-grid" hx-swap="innerHTML"
+              class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input type="text" name="lat" placeholder="Latitude" value="12.9352"
+                class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+            <input type="text" name="lng" placeholder="Longitude" value="77.6245"
+                class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+            <input type="number" name="radius" placeholder="Radius km" value="5" min="1" max="50" step="0.5"
+                class="px-3 py-2 text-sm border border-gray-300 rounded-lg" />
+            <button type="submit"
+                class="px-4 py-2 text-sm font-medium bg-gray-900 hover:bg-black text-white rounded-lg">
+                Find nearby
+            </button>
+        </form>
+        <p class="text-xs text-gray-500 mt-2">Default coordinates are Koramangala, Bengaluru.</p>
+    </div>
+</div>
+<div id="shop-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% include "shops/_grid.html" %}
+</div>
+{% endblock %}

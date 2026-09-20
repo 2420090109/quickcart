@@ -1,0 +1,73 @@
+<div id="order-tracking" hx-get="/orders/{{ order.code }}/tracking" hx-trigger="every 15s" hx-swap="innerHTML">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Order {{ order.code }}</h1>
+            <p class="text-sm text-gray-600 mt-0.5">Placed {{ order.created_at.strftime('%d %b %Y at %I:%M %p') }}</p>
+        </div>
+        {% set colors = {
+            'placed':'bg-blue-100 text-blue-800',
+            'accepted':'bg-indigo-100 text-indigo-800',
+            'packing':'bg-amber-100 text-amber-800',
+            'packed':'bg-amber-100 text-amber-800',
+            'out_for_delivery':'bg-purple-100 text-purple-800',
+            'delivered':'bg-brand-100 text-brand-800',
+            'cancelled':'bg-red-100 text-red-800',
+            'rejected':'bg-red-100 text-red-800',
+        } %}
+        <span class="text-xs font-semibold px-3 py-1.5 rounded-full {{ colors.get(order.status.value, 'bg-gray-100 text-gray-800') }}">
+            {{ order.status.value.replace('_',' ').upper() }}
+        </span>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 class="font-semibold text-gray-900 mb-4">Status timeline</h2>
+                {% include "orders/_timeline.html" %}
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 class="font-semibold text-gray-900 mb-4">Items</h2>
+                <div class="divide-y divide-gray-100">
+                    {% for item in order.items %}
+                    <div class="flex items-center justify-between py-3">
+                        <div>
+                            <div class="font-medium text-gray-900">{{ item.product_name }}</div>
+                            <div class="text-xs text-gray-500">{{ item.quantity }} × {{ item.product_unit }} × ₹{{ item.unit_price }}</div>
+                        </div>
+                        <div class="font-semibold text-gray-900">₹{{ item.line_total }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-1 space-y-6">
+            {% if order.status.value not in ('delivered','cancelled','rejected','refunded') %}
+            <div class="bg-gradient-to-br from-brand-50 to-brand-100 border border-brand-200 rounded-2xl p-5">
+                <div class="text-xs font-semibold text-brand-800 uppercase tracking-wide">Delivery OTP</div>
+                <div class="text-3xl font-bold text-brand-800 mt-1 tracking-widest">{{ order.delivery_otp }}</div>
+                <p class="text-xs text-brand-700 mt-2">Share this code with your delivery partner to receive the order.</p>
+            </div>
+            {% endif %}
+            {% include "orders/_payment_button.html" %}
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 class="font-semibold text-gray-900 mb-4">Summary</h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span>₹{{ order.subtotal }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Delivery</span><span>₹{{ order.delivery_fee }}</span></div>
+                    <div class="flex justify-between pt-2 border-t border-gray-200 font-semibold text-gray-900">
+                        <span>Total</span><span>₹{{ order.total }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                <h2 class="font-semibold text-gray-900 mb-3">Delivering to</h2>
+                <div class="text-sm text-gray-700">
+                    <div class="font-medium">{{ order.delivery_label }}</div>
+                    <div class="mt-1">{{ order.delivery_line1 }}</div>
+                    {% if order.delivery_line2 %}<div>{{ order.delivery_line2 }}</div>{% endif %}
+                    <div>{{ order.delivery_city }} — {{ order.delivery_pincode }}</div>
+                    <div class="mt-2 text-xs text-gray-500">📞 {{ order.delivery_phone }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

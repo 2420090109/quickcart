@@ -1,0 +1,136 @@
+{% if error %}
+<div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+    {{ error }}
+</div>
+{% endif %}
+{# ============ MY ACTIVE DELIVERIES ============ #}
+<div class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">My deliveries ({{ my_assignments | length }})</h2>
+    {% if my_assignments %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for a in my_assignments %}
+        {% set o = a.order %}
+        <div class="bg-white border-2 border-brand-500 rounded-2xl p-5">
+            <div class="flex items-start justify-between gap-2 mb-3">
+                <div>
+                    <div class="font-bold text-gray-900">{{ o.code }}</div>
+                    <div class="text-xs text-gray-500">Assigned {{ a.created_at.strftime('%I:%M %p') }}</div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-1 rounded-full
+                    {% if a.status.value == 'assigned' %}bg-indigo-100 text-indigo-800
+                    {% elif a.status.value == 'picked_up' %}bg-purple-100 text-purple-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ a.status.value.replace('_',' ').upper() }}
+                </span>
+            </div>
+            {# Customer address #}
+            <div class="bg-gray-50 rounded-lg p-3 text-sm mb-3">
+                <div class="font-semibold text-gray-900">{{ o.delivery_label }}</div>
+                <div class="text-gray-600 mt-0.5">{{ o.delivery_line1 }}</div>
+                <div class="text-gray-600">{{ o.delivery_city }} — {{ o.delivery_pincode }}</div>
+                {% if o.customer_note %}
+                <div class="mt-2 text-xs italic text-amber-700">"{{ o.customer_note }}"</div>
+                {% endif %}
+            </div>
+            {# Action buttons #}
+            <div class="flex flex-wrap gap-2">
+                <a href="tel:{{ o.delivery_phone }}"
+                   class="flex-1 text-center px-3 py-2 text-sm font-medium bg-white border border-gray-300 hover:border-gray-400 text-gray-800 rounded-lg">
+                    📞 Call
+                </a>
+                {% if a.status.value == 'assigned' or a.status.value == 'accepted' %}
+                <button hx-post="/delivery-dashboard/orders/{{ o.code }}/pickup"
+                    hx-target="#delivery-body"
+                    hx-swap="innerHTML"
+                    class="flex-1 px-3 py-2 text-sm font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded-lg">
+                    🛵 Picked up
+                </button>
+                {% elif a.status.value == 'picked_up' %}
+                <button type="button"
+                    onclick="document.getElementById('otp-modal-{{ o.code }}').showModal()"
+                    class="flex-1 px-3 py-2 text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg">
+                    ✓ Complete delivery
+                </button>
+                {% endif %}
+            </div>
+            {# Location push button — for demo #}
+            {% if a.status.value == 'picked_up' %}
+            <button hx-post="/delivery-dashboard/location"
+                hx-vals='{"order_code":"{{ o.code }}","latitude":"12.9352","longitude":"77.6245"}'
+                hx-target="#delivery-body"
+                hx-swap="innerHTML"
+                class="mt-2 w-full text-xs text-gray-500 hover:text-brand-600">
+                📍 Push current location
+            </button>
+            {% endif %}
+            {# OTP modal #}
+            <dialog id="otp-modal-{{ o.code }}" class="rounded-2xl p-6 max-w-sm w-full backdrop:bg-black/50">
+                <form hx-post="/delivery-dashboard/orders/{{ o.code }}/deliver"
+                      hx-target="#delivery-body"
+                      hx-swap="innerHTML"
+                      onsubmit="setTimeout(() => document.getElementById('otp-modal-{{ o.code }}').close(), 500)">
+                    <h3 class="font-semibold text-gray-900 text-lg">Enter delivery OTP</h3>
+                    <p class="text-xs text-gray-600 mt-1">Ask the customer for the 4-digit code on their order page.</p>
+                    <input name="otp" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="6" required
+                        placeholder="1234"
+                        class="mt-4 w-full px-4 py-3 text-center text-2xl font-bold tracking-widest border-2 border-gray-300 rounded-lg focus:border-brand-500" />
+                    <div class="flex gap-2 mt-4">
+                        <button type="button"
+                            onclick="document.getElementById('otp-modal-{{ o.code }}').close()"
+                            class="flex-1 px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="flex-1 px-3 py-2 text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg">
+                            Deliver
+                        </button>
+                    </div>
+                </form>
+            </dialog>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-8 text-center">
+        <div class="text-4xl">🛵</div>
+        <p class="text-sm text-gray-600 mt-2">No active deliveries. Pick one from below.</p>
+    </div>
+    {% endif %}
+</div>
+{# ============ AVAILABLE PICKUPS ============ #}
+<div>
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">Available pickups ({{ available | length }})</h2>
+    {% if available %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for o in available %}
+        <div class="bg-white border border-gray-200 rounded-2xl p-5">
+            <div class="flex items-start justify-between gap-2 mb-3">
+                <div>
+                    <div class="font-bold text-gray-900">{{ o.code }}</div>
+                    <div class="text-xs text-gray-500">{{ o.created_at.strftime('%I:%M %p') }}</div>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-100 text-amber-800">
+                    PACKED
+                </span>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3 text-sm mb-3">
+                <div class="text-gray-600">Deliver to</div>
+                <div class="font-semibold text-gray-900 mt-0.5">{{ o.delivery_city }} — {{ o.delivery_pincode }}</div>
+                <div class="text-xs text-gray-500 mt-1">{{ o.delivery_line1 }}</div>
+            </div>
+            <button hx-post="/delivery-dashboard/orders/{{ o.code }}/accept"
+                hx-target="#delivery-body"
+                hx-swap="innerHTML"
+                class="w-full px-3 py-2 text-sm font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg">
+                Claim this pickup
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-gray-50 border border-dashed border-gray-300 rounded-xl p-8 text-center">
+        <div class="text-4xl">📭</div>
+        <p class="text-sm text-gray-600 mt-2">No packed orders waiting right now.</p>
+    </div>
+    {% endif %}
+</div>

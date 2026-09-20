@@ -1,0 +1,58 @@
+{% if products %}
+    {% for p in products %}
+    <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col">
+        {# Image area — emoji placeholder based on product name #}
+        <div class="aspect-square bg-gradient-to-br from-gray-50 to-brand-50 grid place-items-center relative">
+            <span class="text-5xl">
+                {%- if 'banana' in p.name|lower %}🍌
+                {%- elif 'apple' in p.name|lower %}🍎
+                {%- elif 'tomato' in p.name|lower %}🍅
+                {%- elif 'onion' in p.name|lower %}🧅
+                {%- elif 'milk' in p.name|lower %}🥛
+                {%- elif 'bread' in p.name|lower %}🍞
+                {%- elif 'lays' in p.name|lower or 'kurkure' in p.name|lower %}🥔
+                {%- else %}🛒
+                {%- endif %}
+            </span>
+            {% if p.mrp and p.mrp > p.price %}
+            <span class="absolute top-2 left-2 text-[10px] font-bold px-1.5 py-0.5 bg-brand-600 text-white rounded">
+                {{ ((1 - (p.price / p.mrp)) * 100) | round(0) | int }}% OFF
+            </span>
+            {% endif %}
+            {% if p.available_qty == 0 %}
+            <div class="absolute inset-0 bg-white/70 grid place-items-center">
+                <span class="text-xs font-bold text-gray-700 bg-white px-2 py-1 rounded border border-gray-300">OUT OF STOCK</span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="p-3 flex flex-col flex-1">
+            <h3 class="text-sm font-semibold text-gray-900 line-clamp-2 leading-tight min-h-[2.5rem]">{{ p.name }}</h3>
+            <p class="text-xs text-gray-500 mt-1">{{ p.unit }}</p>
+            <div class="mt-auto pt-3 flex items-center justify-between">
+                <div>
+                    <div class="text-sm font-bold text-gray-900">₹{{ p.price }}</div>
+                    {% if p.mrp and p.mrp > p.price %}
+                    <div class="text-xs text-gray-400 line-through">₹{{ p.mrp }}</div>
+                    {% endif %}
+                </div>
+                {% if p.available_qty > 0 %}
+               <button hx-post="/cart/add"
+        hx-vals='{"product_id":"{{ p.id }}","quantity":1}'
+        hx-target="#cart-drawer-body"
+        hx-swap="innerHTML"
+        onclick="event.stopPropagation(); event.preventDefault();"
+        class="px-3 py-1.5 text-xs font-bold text-brand-700 border-2 border-brand-600 hover:bg-brand-600 hover:text-white rounded-lg transition-colors">
+    ADD
+</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="col-span-full text-center py-16">
+        <div class="text-6xl">🛒</div>
+        <h3 class="mt-4 font-semibold text-gray-900">No products here</h3>
+        <p class="text-sm text-gray-600 mt-1">Try a different category.</p>
+    </div>
+{% endif %}

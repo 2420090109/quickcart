@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Delivery — QuickCart{% endblock %}
+{% block content %}
+<div class="mb-6">
+    <div class="text-xs font-semibold text-brand-600 uppercase tracking-wide">Delivery Partner</div>
+    <h1 class="text-2xl font-bold text-gray-900 mt-0.5">Hi, {{ current_user.full_name.split(' ')[0] }}</h1>
+    <p class="text-sm text-gray-600 mt-0.5">Pick up orders and deliver them to customers.</p>
+</div>
+<div id="delivery-body" hx-get="/delivery-dashboard" hx-trigger="every 30s" hx-swap="innerHTML">
+    {% include "delivery/_dashboard_body.html" %}
+</div>
+{% endblock %}

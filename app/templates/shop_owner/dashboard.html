@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Shop Dashboard — {{ shop.name }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+        <div class="text-xs font-semibold text-brand-600 uppercase tracking-wide">Shop Dashboard</div>
+        <h1 class="text-2xl font-bold text-gray-900 mt-0.5">{{ shop.name }}</h1>
+        <p class="text-sm text-gray-600 mt-0.5">{{ shop.city }} · {{ shop.pincode }}</p>
+    </div>
+    {# Stats #}
+    <div class="flex gap-3">
+        <div class="bg-white border border-gray-200 rounded-xl px-5 py-3">
+            <div class="text-xs text-gray-500">Orders today</div>
+            <div class="text-xl font-bold text-gray-900 mt-0.5">{{ total_orders }}</div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl px-5 py-3">
+            <div class="text-xs text-gray-500">Revenue today</div>
+            <div class="text-xl font-bold text-brand-700 mt-0.5">₹{{ total_revenue }}</div>
+        </div>
+    </div>
+</div>
+{# Tabs #}
+<div class="border-b border-gray-200 mb-6">
+    <nav class="flex gap-6">
+        <a href="/shop-dashboard?filter=new"
+           hx-get="/shop-dashboard?filter=new"
+           hx-target="#queue"
+           hx-swap="innerHTML"
+           class="pb-3 -mb-px border-b-2 {% if filter == 'new' %}border-brand-600 text-brand-700 font-semibold{% else %}border-transparent text-gray-600 hover:text-gray-900{% endif %} text-sm">
+            New
+            {% if new_count %}<span class="ml-1 px-2 py-0.5 bg-brand-100 text-brand-800 text-xs font-bold rounded-full">{{ new_count }}</span>{% endif %}
+        </a>
+        <a href="/shop-dashboard?filter=in_progress"
+           hx-get="/shop-dashboard?filter=in_progress"
+           hx-target="#queue"
+           hx-swap="innerHTML"
+           class="pb-3 -mb-px border-b-2 {% if filter == 'in_progress' %}border-brand-600 text-brand-700 font-semibold{% else %}border-transparent text-gray-600 hover:text-gray-900{% endif %} text-sm">
+            In Progress
+            {% if in_progress_count %}<span class="ml-1 px-2 py-0.5 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">{{ in_progress_count }}</span>{% endif %}
+        </a>
+        <a href="/shop-dashboard?filter=completed"
+           hx-get="/shop-dashboard?filter=completed"
+           hx-target="#queue"
+           hx-swap="innerHTML"
+           class="pb-3 -mb-px border-b-2 {% if filter == 'completed' %}border-brand-600 text-brand-700 font-semibold{% else %}border-transparent text-gray-600 hover:text-gray-900{% endif %} text-sm">
+            Completed
+            {% if completed_count %}<span class="ml-1 px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">{{ completed_count }}</span>{% endif %}
+        </a>
+    </nav>
+</div>
+{# Auto-refresh every 30s #}
+<div id="queue"
+     hx-get="/shop-dashboard?filter={{ filter }}"
+     hx-trigger="every 30s"
+     hx-swap="innerHTML">
+    {% include "shop_owner/_queue.html" %}
+</div>
+{% endblock %}

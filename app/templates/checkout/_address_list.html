@@ -1,0 +1,17 @@
+{% if addresses %}
+    <div class="space-y-2">
+        {% for a in addresses %}
+        <label class="flex items-start gap-3 p-3 border-2 border-gray-200 hover:border-brand-500 rounded-xl cursor-pointer">
+            <input type="radio" name="address_id" value="{{ a.id }}" {% if loop.first %}checked{% endif %} class="text-brand-600 mt-0.5" />
+            <div class="min-w-0">
+                <div class="text-sm font-semibold text-gray-900">{{ a.label }}</div>
+                <div class="text-xs text-gray-600 truncate">{{ a.line1 }}, {{ a.city }} — {{ a.pincode }}</div>
+            </div>
+        </label>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-4">
+        No saved addresses yet. Click <b>+ Add new</b> above to add one.
+    </div>
+{% endif %}

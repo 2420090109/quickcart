@@ -1,0 +1,38 @@
+{# A single cart line — used inside the drawer #}
+<div class="flex items-start gap-3">
+    {# Product emoji avatar #}
+    <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-gray-50 to-brand-50 grid place-items-center flex-shrink-0">
+        <span class="text-2xl">
+            {%- if 'banana' in item.product_name|lower %}🍌
+            {%- elif 'apple' in item.product_name|lower %}🍎
+            {%- elif 'tomato' in item.product_name|lower %}🍅
+            {%- elif 'onion' in item.product_name|lower %}🧅
+            {%- elif 'milk' in item.product_name|lower %}🥛
+            {%- elif 'bread' in item.product_name|lower %}🍞
+            {%- elif 'lays' in item.product_name|lower or 'kurkure' in item.product_name|lower %}🥔
+            {%- else %}🛒
+            {%- endif %}
+        </span>
+    </div>
+    {# Name + price #}
+    <div class="flex-1 min-w-0">
+        <div class="text-sm font-medium text-gray-900 truncate">{{ item.product_name }}</div>
+        <div class="text-xs text-gray-500">{{ item.product_unit }}</div>
+        <div class="text-sm font-semibold text-gray-900 mt-1">₹{{ item.line_total }}</div>
+    </div>
+    {# Quantity stepper + remove #}
+    <div class="flex flex-col items-end gap-1">
+        <div class="flex items-center bg-brand-600 text-white rounded-lg overflow-hidden">
+            <button hx-post="/cart/update" hx-target="#cart-drawer-body" hx-swap="innerHTML"
+                hx-vals='{"item_id":"{{ item.id }}","quantity":{{ item.quantity - 1 }}}'
+                class="px-2 py-1 hover:bg-brand-700 font-bold">−</button>
+            <span class="px-2 text-sm font-semibold min-w-[20px] text-center">{{ item.quantity }}</span>
+            <button hx-post="/cart/update" hx-target="#cart-drawer-body" hx-swap="innerHTML"
+                hx-vals='{"item_id":"{{ item.id }}","quantity":{{ item.quantity + 1 }}}'
+                class="px-2 py-1 hover:bg-brand-700 font-bold">+</button>
+        </div>
+        <button hx-post="/cart/remove" hx-target="#cart-drawer-body" hx-swap="innerHTML"
+            hx-vals='{"item_id":"{{ item.id }}"}'
+            class="text-xs text-gray-400 hover:text-red-600 transition-colors">Remove</button>
+    </div>
+</div>
