@@ -1,3 +1,4 @@
+"""Database session + Redis client."""
 from collections.abc import AsyncGenerator
 import redis.asyncio as aioredis
 from sqlalchemy.ext.asyncio import (
@@ -6,13 +7,18 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from app.core.config import settings
+# SSL is required for Render's Postgres but NOT for local Docker.
+# Only add connect_args={"ssl": "require"} if we're talking to Render.
+_connect_args: dict = {}
+if "render.com" in settings.DATABASE_URL:
+    _connect_args["ssl"] = "require"
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
-    connect_args={"ssl": "require"},
+    connect_args=_connect_args,
 )
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
